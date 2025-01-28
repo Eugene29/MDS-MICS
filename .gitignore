@@ -76,3 +76,6 @@ logs
 
 # Data folder
 bookcorpus_data/
+
+# Pycache
+*__pycache__*
