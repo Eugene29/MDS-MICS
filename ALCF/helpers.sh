@@ -749,7 +749,8 @@ set_args() {
     fi
     ds_args+=("--deepspeed_config=${DS_CONFIG}")
     ds_args+=("--zero-stage=$ZERO_STAGE")
-    if [[ "${ZERO_STAGE}" == 3 ]]; then
+    # if [[ "${ZERO_STAGE}" == 3 ]]; then
+    if [[ $MICS == 1 ]]; then
         ds_args+=("--use-mics")
     fi
     # ds_args=" "
@@ -1273,13 +1274,34 @@ generateDSconfig() {
     else
         optimizer=""
     fi
-    if [[ "${ZERO_STAGE}" == 3 ]]; then
-        # \"mics_shard_size\": 2,
+    if [[ ("${ZERO_STAGE}" == 3) && ($MICS == 1) ]]; then
         zero="\
             \"zero_optimization\": {
               \"stage\": 3,
               \"reduce_scatter\": false,
               \"mics_hierarchical_params_gather\": true,
+              \"mics_shard_size\": 4,
+              \"stage3_max_live_parameters\": 3e9,
+              \"stage3_max_reuse_distance\": 3e9,
+              \"stage3_param_persistence_threshold\": 1e5,
+              \"stage3_prefetch_bucket_size\": 5e7,
+              \"contiguous_gradients\": true,
+              \"overlap_comm\": true,
+              \"reduce_bucket_size\": 90000000,
+              \"sub_group_size\": 1e9,
+              \"offload_optimizer\": {
+                \"device\": \"none\",
+                \"buffer_count\": 4,
+                \"pipeline_read\": false,
+                \"pipeline_write\": false,
+                \"pin_memory\": true
+              }
+            },"
+    elif [[ "${ZERO_STAGE}" == 3 ]]; then
+        zero="\
+            \"zero_optimization\": {
+              \"stage\": 3,
+              \"reduce_scatter\": false,
               \"stage3_max_live_parameters\": 3e9,
               \"stage3_max_reuse_distance\": 3e9,
               \"stage3_param_persistence_threshold\": 1e5,
