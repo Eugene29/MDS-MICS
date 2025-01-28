@@ -7,6 +7,7 @@ export SAVE_INTERVAL=1000
 export GRAD_ACC_STEPS=1
 # export DTYPE="fp16"
 export NLAYERS=10
+export PYTHONPATH="$PBS_O_WORKDIR:$PYTHONPATH"
 
 # Large+ (470M)
 # export NLAYERS=24
