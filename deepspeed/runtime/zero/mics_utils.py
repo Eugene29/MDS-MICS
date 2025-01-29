@@ -64,7 +64,7 @@ def create_mics_comm_groups(
     groups = MiCS_CommGroups()
 
     if mpu is not None:
-        assert dp_group == mpu.get_data_parallel_group()
+        assert (dp_group == mpu.get_data_parallel_group()) or (dp_group == mpu.get_sequence_data_parallel_group())
 
     # full size of the world
     world_size = dist.get_world_size()
